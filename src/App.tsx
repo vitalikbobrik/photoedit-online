@@ -25,8 +25,8 @@ const App: React.FC = () => {
       const file = await pasteImageFromClipboard();
       if (file) loadImage(file);
     };
-    document.addEventListener('paste', handler as EventListener);
-    return () => document.removeEventListener('paste', handler as EventListener);
+    document.addEventListener('paste', handler as unknown as EventListener);
+    return () => document.removeEventListener('paste', handler as unknown as EventListener);
   }, [loadImage]);
 
   return (

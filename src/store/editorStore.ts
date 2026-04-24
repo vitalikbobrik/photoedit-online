@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import { castDraft } from 'immer';
 import type {
   Tool, AspectRatio, CropRect,
   FilterState, AdjustState, EffectsState, WatermarkState, ExportSettings,
@@ -168,11 +169,11 @@ export const useEditorStore = create<EditorStore>()(
       }
       URL.revokeObjectURL(url);
       set(s => {
-        s.image = src;
+        s.image = castDraft(src);
         s.imageWidth = src.width;
         s.imageHeight = src.height;
         if (file instanceof File) {
-          s.sourceImage = src;
+          s.sourceImage = castDraft(src);
           s.fileName = file.name.replace(/\.[^.]+$/, '');
         }
         s.crop = defaultCrop;
@@ -278,7 +279,7 @@ export const useEditorStore = create<EditorStore>()(
       const src = get().sourceImage;
       if (!src) return;
       set(s => {
-        s.image = src;
+        s.image = castDraft(src);
         s.imageWidth = src.width;
         s.imageHeight = src.height;
         s.crop = defaultCrop;
