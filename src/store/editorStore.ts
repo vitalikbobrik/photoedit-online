@@ -12,7 +12,7 @@ type Snapshot = {
   rotation: number; flipX: boolean; flipY: boolean;
   crop: CropRect; cropAspect: AspectRatio; cropCircular: boolean;
   filters: FilterState; adjustments: AdjustState; effects: EffectsState;
-  watermark: WatermarkState;
+  watermark: WatermarkState; eraserMaskDataUrl: string | null;
 };
 
 function snapshot(s: EditorStore): Snapshot {
@@ -21,6 +21,7 @@ function snapshot(s: EditorStore): Snapshot {
     crop: { ...s.crop }, cropAspect: s.cropAspect, cropCircular: s.cropCircular,
     filters: { ...s.filters }, adjustments: { ...s.adjustments },
     effects: { ...s.effects }, watermark: { ...s.watermark },
+    eraserMaskDataUrl: s.eraserMaskDataUrl,
   };
 }
 
@@ -60,6 +61,10 @@ export interface EditorStore {
 
   // export
   exportSettings: ExportSettings;
+
+  // eraser
+  eraserSize: number;
+  eraserMaskDataUrl: string | null;
 
   // bg remove
   bgThreshold: number;
@@ -104,6 +109,9 @@ export interface EditorStore {
   setExport: (u: Partial<ExportSettings>) => void;
   setView: (zoom: number, panX: number, panY: number) => void;
   setResizePreview: (v: { w: number; h: number } | null) => void;
+  setEraserSize: (v: number) => void;
+  setEraserMask: (dataUrl: string | null) => void;
+  bakeErase: (img: HTMLImageElement, w: number, h: number) => void;
   setBgThreshold: (v: number) => void;
   setBgColor: (c: [number, number, number] | null) => void;
   resetAll: () => void;
@@ -139,6 +147,7 @@ export const useEditorStore = create<EditorStore>()(
     effects: { ...defaultEffects },
     watermark: { ...defaultWm },
     exportSettings: { format: 'png', quality: 90 },
+    eraserSize: 30, eraserMaskDataUrl: null,
     bgThreshold: 40, bgPickedColor: null,
     zoom: 1, panX: 0, panY: 0,
     resizePreview: null,
@@ -184,6 +193,7 @@ export const useEditorStore = create<EditorStore>()(
         s.watermark = { ...defaultWm };
         s.past = []; s.future = [];
         s.zoom = 1; s.panX = 0; s.panY = 0;
+        s.eraserMaskDataUrl = null;
         s.version++;
       });
     },
@@ -233,6 +243,17 @@ export const useEditorStore = create<EditorStore>()(
     setExport: (u) => set(s => { Object.assign(s.exportSettings, u); }),
     setView: (zoom, panX, panY) => set(s => { s.zoom = zoom; s.panX = panX; s.panY = panY; }),
     setResizePreview: (v) => set(s => { s.resizePreview = v; s.version++; }),
+    setEraserSize: (v) => set(s => { s.eraserSize = v; }),
+    setEraserMask: (dataUrl) => set(s => { s.eraserMaskDataUrl = dataUrl; }),
+    bakeErase: (img, w, h) => set(s => {
+      s.image = castDraft(img);
+      s.imageWidth = w;
+      s.imageHeight = h;
+      s.crop = { ...defaultCrop };
+      s.rotation = 0; s.flipX = false; s.flipY = false;
+      s.eraserMaskDataUrl = null;
+      s.version++;
+    }),
     setBgThreshold: (v) => set(s => { s.bgThreshold = v; }),
     setBgColor: (c) => set(s => { s.bgPickedColor = c; }),
 
@@ -289,6 +310,7 @@ export const useEditorStore = create<EditorStore>()(
         s.effects = { ...defaultEffects };
         s.past = []; s.future = [];
         s.zoom = 1; s.panX = 0; s.panY = 0;
+        s.eraserMaskDataUrl = null;
         s.version++;
       });
     },

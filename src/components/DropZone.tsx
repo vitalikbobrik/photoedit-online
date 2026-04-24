@@ -20,9 +20,10 @@ const DropZone: React.FC = () => {
       onDrop={handleDrop}
       onClick={() => fileRef.current?.click()}
       style={{
+        position: 'absolute', inset: 20,
         border: `1.5px dashed ${drag ? 'var(--accent)' : 'rgba(124,108,248,0.3)'}`,
-        borderRadius: 20, padding: '72px 96px',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+        borderRadius: 20,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20,
         cursor: 'pointer', transition: 'all .25s',
         background: drag ? 'rgba(124,108,248,0.08)' : 'rgba(124,108,248,0.03)',
         userSelect: 'none',

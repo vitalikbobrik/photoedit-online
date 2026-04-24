@@ -5,6 +5,7 @@ import CircleCropPanel from './panels/CircleCropPanel';
 import FiltersPanel from './panels/FiltersPanel';
 import AdjustPanel from './panels/AdjustPanel';
 import EffectsPanel from './panels/EffectsPanel';
+import EraserPanel from './panels/EraserPanel';
 import BgRemovePanel from './panels/BgRemovePanel';
 import WatermarkPanel from './panels/WatermarkPanel';
 import ResizePanel from './panels/ResizePanel';
@@ -13,6 +14,7 @@ import ExportPanel from './panels/ExportPanel';
 const PANEL_MAP: Record<string, React.FC> = {
   crop: CropPanel,
   circlecrop: CircleCropPanel,
+  eraser: EraserPanel,
   filters: FiltersPanel,
   adjust: AdjustPanel,
   effects: EffectsPanel,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { renderToCanvas } from '../../core/renderer';
+import { editorCanvasRef } from '../../editorCanvasRef';
 import { downloadCanvas } from '../../utils/download';
 import Slider from '../ui/Slider';
 
@@ -16,8 +17,19 @@ const ExportPanel: React.FC = () => {
 
   const handleExport = (fmt: 'png' | 'jpeg') => {
     if (!image) return;
+
+    // Use the live editor canvas (already has eraser mask applied).
+    // Fall back to a fresh render if the ref isn't set yet.
+    const src = editorCanvasRef.current;
     const canvas = document.createElement('canvas');
-    renderToCanvas(canvas, state);
+    if (src) {
+      canvas.width = src.width;
+      canvas.height = src.height;
+      canvas.getContext('2d')!.drawImage(src, 0, 0);
+    } else {
+      renderToCanvas(canvas, state);
+    }
+
     downloadCanvas(canvas, fmt, exportSettings.quality, fileName);
   };
 

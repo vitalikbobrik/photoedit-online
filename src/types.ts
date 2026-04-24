@@ -1,6 +1,7 @@
 export type Tool =
   | 'crop'
   | 'circlecrop'
+  | 'eraser'
   | 'filters'
   | 'adjust'
   | 'effects'

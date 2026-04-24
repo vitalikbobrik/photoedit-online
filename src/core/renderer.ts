@@ -123,6 +123,38 @@ function applyWatermark(ctx: CanvasRenderingContext2D, w: number, h: number, wm:
   ctx.restore();
 }
 
+// ── base render (crop + rotation + flip only, no filters/effects) ────────────
+
+export function renderBaseToCanvas(dest: HTMLCanvasElement, state: EditorStore): void {
+  const img = state.image;
+  if (!img) return;
+
+  const rotated = state.rotation === 90 || state.rotation === 270;
+  const tw = rotated ? img.height : img.width;
+  const th = rotated ? img.width : img.height;
+
+  const tfm = document.createElement('canvas');
+  tfm.width = tw; tfm.height = th;
+  const tc = tfm.getContext('2d')!;
+  tc.save();
+  tc.translate(tw / 2, th / 2);
+  tc.rotate((state.rotation * Math.PI) / 180);
+  tc.scale(state.flipX ? -1 : 1, state.flipY ? -1 : 1);
+  tc.drawImage(img, -img.width / 2, -img.height / 2);
+  tc.restore();
+
+  const cx = state.crop.width > 0 ? state.crop.x : 0;
+  const cy = state.crop.width > 0 ? state.crop.y : 0;
+  const cw = state.crop.width > 0 ? state.crop.width : tw;
+  const ch = state.crop.height > 0 ? state.crop.height : th;
+
+  dest.width = Math.round(cw);
+  dest.height = Math.round(ch);
+  const ctx = dest.getContext('2d')!;
+  ctx.clearRect(0, 0, dest.width, dest.height);
+  ctx.drawImage(tfm, cx, cy, cw, ch, 0, 0, cw, ch);
+}
+
 // ── main render ─────────────────────────────────────────────────────────────
 
 export function renderToCanvas(dest: HTMLCanvasElement, state: EditorStore): void {

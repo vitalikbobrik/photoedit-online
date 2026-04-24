@@ -5,6 +5,7 @@ import type { Tool } from '../types';
 const TOOLS: { id: Tool; icon: string; label: string }[] = [
   { id: 'crop',      icon: '✂️',  label: 'Crop'      },
   { id: 'circlecrop',icon: '⭕',   label: 'Circle'    },
+  { id: 'eraser',    icon: '🧹',   label: 'Eraser'    },
   { id: 'filters',   icon: '🎞️',  label: 'Filters'   },
   { id: 'adjust',    icon: '🎚️',  label: 'Adjust'    },
   { id: 'effects',   icon: '✨',   label: 'Effects'   },
